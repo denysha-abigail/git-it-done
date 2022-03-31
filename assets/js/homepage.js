@@ -20,32 +20,44 @@ var repoContainerEl = document.querySelector("#repos-container");
 var repoSearchTerm = document.querySelector("#repo-search-term");
 
 
-var getUserRepos = function(user) {
+var getUserRepos = function (user) {
     // format the github api url
-    
+
     var apiUrl = "https://api.github.com/users/" + user + "/repos";
 
     // make a request to the url
-    fetch(apiUrl).then(function(response){
-        response.json().then(function(data){
-            // when the response data is converted to JSON, it will be sent from getUserRepos() to displayRepos()
-            displayRepos(data, user);
+    fetch(apiUrl).then(function (response) {
+        // we can check if it was a successful request by using the ok property that's bundled in the response object from fetch()
+        // request was successful
+        if (response.ok) {
+            response.json().then(function (data) {
+                // when the response data is converted to JSON, it will be sent from getUserRepos() to displayRepos()
+                displayRepos(data, user);
+            });
+        } else {
+            // custome alert message to let the user know that their search was unsuccessful
+            alert("Error: GitHub User Not Found");
+        }
+    })
+        // fetch api's way of handling network errors
+        .catch(function(error){
+            // notice this '.catch()' getting chained onto the end of the '.then()' method
+            alert("Unable to connect to Github");
         });
-    });
 
     // returns promise that acts like more advanced callback functions; promises have a method called then() that is called when the promise has been fulfilled
-            // var response = fetch("https://api.github.com/users/octocat/repos").then(function(response){
-            //     console.log("inside", response);
-            //     // format the response to display an array; the response object has a method called json() which formats the response as JSON; if a resource returns non-JSON data, then the text() method would be used; the json() method returns yet another promise, whose callback function captures the actual data
-            //     response.json().then(function(data){
-            //         console.log(data);
-            //     });
-            // });
+    // var response = fetch("https://api.github.com/users/octocat/repos").then(function(response){
+    //     console.log("inside", response);
+    //     // format the response to display an array; the response object has a method called json() which formats the response as JSON; if a resource returns non-JSON data, then the text() method would be used; the json() method returns yet another promise, whose callback function captures the actual data
+    //     response.json().then(function(data){
+    //         console.log(data);
+    //     });
+    // });
     // this prints out first - asynchronous behavior: JavaScript will set aside the fetch request and continue implementing the rest of your code, then come back and run the fetch callback when the response is ready; this kind of asynchronous communication with a server is often referred to as AJAX (or Asynchronous JavaScript and XML - [old-fashioned way of formatting data replaced by JSON]);
-            // console.log("outside");
+    // console.log("outside");
 };
 
-var formSubmitHandler = function(event) {
+var formSubmitHandler = function (event) {
     // stops the browser from performing the default action the event wants it to do; prevents the browser from sending the form's input data to a URL
     event.preventDefault();
 
@@ -64,7 +76,12 @@ var formSubmitHandler = function(event) {
     }
 }
 
-var displayRepos = function(repos, searchTerm) {
+var displayRepos = function (repos, searchTerm) {
+    // check if api returned any repos
+    if (repos.length === 0) {
+        repoContainerEl.textContent = "No repositories found.";
+        return;
+    }
     // clear old content
     repoContainerEl.textContent = "";
     repoSearchTerm.textContent = searchTerm;
@@ -97,7 +114,7 @@ var displayRepos = function(repos, searchTerm) {
         // check if current repo has issues or not
         // use if statement to check how many issues the repository has; if the number is greater than zero, then we'll display the number of issues and add a red X icon next to it; if there are no issues, we'll display a blue check mark instead
         if (repos[i].open_issues_count > 0) {
-            statusEl.innerHTML = 
+            statusEl.innerHTML =
                 "<i class='fas fa-times status-icon icon-danger'></i>" + repos[i].open_issues_count + " issue(s)";
         } else {
             statusEl.innerHTML = "<i class='fas fa-check-square status-icon icon-success'></i>";
