@@ -62,7 +62,8 @@ var displayWarning = function(repo) {
     // add text to warning container
     limitWarningEl.textContent = "To see more than 30 issues, visit ";
     var linkEl = document.createElement("a");
-    linkEl.textContent("href", "https://github.com/" + repo + "/issues");
+    linkEl.textContent = "See More Issues on Github.com";
+    linkEl.setAttribute("href", "https://github.com/" + repo + "/issues");
     linkEl.setAttribute("target", "_blank");
 
     // append to warning container
