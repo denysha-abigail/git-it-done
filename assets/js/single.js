@@ -1,5 +1,24 @@
 var issueContainerEl = document.querySelector("#issues-container");
 var limitWarningEl = document.querySelector("#limit-warning");
+var repoNameEl = document.querySelector("#repo-name");
+
+var getRepoName = function () {
+    // use location object and split() method to extract repo name from the query string
+    // assign query string to a variable 
+    var queryString = document.location.search; // evaluates to ?repo=repo user/repo-name --> grab repo name from url query string
+    var repoName = queryString.split("=")[1];
+    // if there is a value in the input field
+    if (repoName) {
+        // display repo name on the page
+        repoNameEl.textContent = repoName;
+        getRepoIssues(repoName);
+    } else {
+        // if no repo was given, redirect to the homepage
+        document.location.replace("./index.html");
+    }
+
+
+}
 
 function getRepoIssues(repo) {
     var apiUrl = "https://api.github.com/repos/" + repo + "/issues?direction=asc";
@@ -18,7 +37,8 @@ function getRepoIssues(repo) {
             });
         }
         else {
-            alert("There was a problem with your request!");
+            // if not successful, redirect to homepage
+            document.location.replace("./index.html");
         }
     });
 };
@@ -58,7 +78,7 @@ var displayIssues = function (issues) {
 };
 
 // create a new displayWarning() function with a repo parameter. Then, in displayWarning(), update the textConten of limitWarningEl with the beginning part of the message
-var displayWarning = function(repo) {
+var displayWarning = function (repo) {
     // add text to warning container
     limitWarningEl.textContent = "To see more than 30 issues, visit ";
     var linkEl = document.createElement("a");
@@ -70,5 +90,5 @@ var displayWarning = function(repo) {
     limitWarningEl.appendChild(linkEl);
 };
 
-getRepoIssues("facebook/react");
+getRepoName();
 
